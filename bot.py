@@ -1,225 +1,195 @@
 import os
-import telebot
-from telebot import types
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    CallbackQueryHandler,
+    ContextTypes,
+)
 
 TOKEN = os.getenv("BOT_TOKEN")
-bot = telebot.TeleBot(TOKEN, parse_mode="HTML")
 
 
-# 🌿 Premium Welcome
-@bot.message_handler(commands=["start"])
-def start(message):
-    markup = types.InlineKeyboardMarkup(row_width=2)
+# =========================
+# 🏠 PREMIUM HOME SCREEN
+# =========================
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    markup.add(
-        types.InlineKeyboardButton("👨 पुरुष स्वास्थ्य", callback_data="male"),
-        types.InlineKeyboardButton("👩 महिला स्वास्थ्य", callback_data="female")
+    text = (
+        "🎵✨ *OLD HINDI MUSIC* ✨🎵\n\n"
+        "👑 *Welcome to Premium Music Bot* 👑\n"
+        "━━━━━━━━━━━━━━━━━━━━\n"
+        "🎶 पुराने हिंदी गानों का शानदार खजाना\n"
+        "💿 1960s • 1970s • 1980s • 1990s\n"
+        "🎤 Singers • 🎬 Movies • 🎼 Songs\n"
+        "━━━━━━━━━━━━━━━━━━━━\n\n"
+        "🎧 *अपना पसंदीदा गाना खोजिए और सुनिए!*"
     )
 
-    markup.add(
-        types.InlineKeyboardButton("🔥 खुजली / जलन", callback_data="itch"),
-        types.InlineKeyboardButton("💧 Discharge", callback_data="discharge")
+    keyboard = [
+
+        [
+            InlineKeyboardButton("🔎 🎵 Search Song", callback_data="search_song")
+        ],
+
+        [
+            InlineKeyboardButton("🎤 Search Singer", callback_data="singer"),
+            InlineKeyboardButton("🎬 Search Movie", callback_data="movie"),
+        ],
+
+        [
+            InlineKeyboardButton("💿 Music Library", callback_data="library"),
+            InlineKeyboardButton("❤️ Favourite", callback_data="favourite"),
+        ],
+
+        [
+            InlineKeyboardButton("🕰️ Recently Played", callback_data="recent"),
+            InlineKeyboardButton("🔀 Random Song", callback_data="random"),
+        ],
+
+        [
+            InlineKeyboardButton("👑 Premium Bot", callback_data="premium"),
+        ],
+
+        [
+            InlineKeyboardButton("ℹ️ About", callback_data="about"),
+            InlineKeyboardButton("❓ Help", callback_data="help"),
+        ],
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await update.message.reply_text(
+        text,
+        parse_mode="Markdown",
+        reply_markup=reply_markup
     )
 
-    markup.add(
-        types.InlineKeyboardButton("🚽 पेशाब की समस्या", callback_data="urine"),
-        types.InlineKeyboardButton("❤️ Sexual Health", callback_data="sexual")
-    )
 
-    markup.add(
-        types.InlineKeyboardButton("🌿 Ayurvedic Guidance", callback_data="ayurveda"),
-        types.InlineKeyboardButton("🩺 Doctor कब दिखाएँ?", callback_data="doctor")
-    )
+# =========================
+# 🔘 BUTTON HANDLER
+# =========================
+async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    text = """
-<b>🌿✨ AYURVEDIC HEALTH CARE ✨🌿</b>
+    query = update.callback_query
+    await query.answer()
 
-━━━━━━━━━━━━━━━━━━
-🔐 <b>Private & Confidential</b>
-━━━━━━━━━━━━━━━━━━
+    if query.data == "search_song":
 
-नमस्ते 🙏
+        await query.message.reply_text(
+            "🔎🎵 *SEARCH SONG*\n\n"
+            "अपना गाना इस तरह लिखें:\n\n"
+            "👉 `Lag Ja Gale`\n"
+            "👉 `Pal Pal Dil Ke Paas`\n"
+            "👉 `Ajeeb Dastan Hai Yeh`\n\n"
+            "🎧 फिर मैं आपके लिए search करूँगा।",
+            parse_mode="Markdown"
+        )
 
-यह Bot आपकी निजी स्वास्थ्य समस्याओं को
-समझने में मदद करने के लिए बनाया गया है।
+    elif query.data == "singer":
 
-👇 अपनी समस्या की Category चुनें:
+        await query.message.reply_text(
+            "🎤✨ *SEARCH SINGER*\n\n"
+            "Singer का नाम लिखें।\n\n"
+            "उदाहरण:\n"
+            "🎙️ Kishore Kumar\n"
+            "🎙️ Lata Mangeshkar\n"
+            "🎙️ Mohammed Rafi\n"
+            "🎙️ Asha Bhosle"
+        )
 
-⚕️ <i>आपकी जानकारी को सम्मान और privacy
-के साथ handle करने के लिए यह Bot बनाया गया है।</i>
+    elif query.data == "movie":
 
-<b>⚠️ ध्यान दें:</b>
-यह Bot Doctor का replacement नहीं है।
-यह सामान्य health information और
-Ayurvedic supportive guidance देता है।
-"""
+        await query.message.reply_text(
+            "🎬✨ *SEARCH MOVIE*\n\n"
+            "Movie का नाम लिखें और उसके पुराने गाने खोजें।"
+        )
 
-    bot.send_message(message.chat.id, text, reply_markup=markup)
+    elif query.data == "library":
 
+        await query.message.reply_text(
+            "💿🎵 *MUSIC LIBRARY*\n\n"
+            "🎶 1960s\n"
+            "🎶 1970s\n"
+            "🎶 1980s\n"
+            "🎶 1990s\n\n"
+            "✨ Music Library जल्द तैयार होगी।"
+        )
 
-# 🔘 Button Handler
-@bot.callback_query_handler(func=lambda call: True)
-def buttons(call):
+    elif query.data == "favourite":
 
-    chat_id = call.message.chat.id
+        await query.message.reply_text(
+            "❤️ *YOUR FAVOURITE SONGS*\n\n"
+            "आपके पसंदीदा गाने यहाँ दिखाई देंगे।"
+        )
 
-    if call.data == "male":
-        text = """
-👨 <b>पुरुष स्वास्थ्य</b>
+    elif query.data == "recent":
 
-अपनी समस्या नीचे message में लिखें।
+        await query.message.reply_text(
+            "🕰️ *RECENTLY PLAYED*\n\n"
+            "आपके हाल में सुने गए गाने यहाँ दिखाई देंगे।"
+        )
 
-उदाहरण:
-• erection में परेशानी
-• जल्दी ejaculation
-• खुजली या जलन
-• private area में discomfort
+    elif query.data == "random":
 
-मैं पहले आपकी समस्या के बारे में कुछ जरूरी
-questions पूछूँगा। 🔎
-"""
+        await query.message.reply_text(
+            "🔀🎵 *RANDOM SONG*\n\n"
+            "आपके लिए एक random old Hindi song चुना जाएगा।"
+        )
 
-    elif call.data == "female":
-        text = """
-👩 <b>महिला स्वास्थ्य</b>
+    elif query.data == "premium":
 
-अपनी समस्या आसान भाषा में लिखें।
+        await query.message.reply_text(
+            "👑✨ *PREMIUM MUSIC EXPERIENCE* ✨👑\n\n"
+            "🎵 Old Hindi Songs\n"
+            "🎤 Singer Search\n"
+            "🎬 Movie Search\n"
+            "💿 Music Library\n"
+            "❤️ Favourite Songs\n"
+            "🔀 Random Songs\n"
+            "🎨 Premium Background\n"
+            "🎞️ Animated GIF Elements\n\n"
+            "🔥 बहुत जल्द और भी premium features!"
+        )
 
-उदाहरण:
-• खुजली / जलन
-• unusual discharge
-• दर्द या discomfort
-• period से जुड़ी समस्या
+    elif query.data == "about":
 
-🔎 पहले symptoms समझे जाएँगे।
-"""
+        await query.message.reply_text(
+            "ℹ️ *ABOUT OLD HINDI MUSIC BOT*\n\n"
+            "🎶 पुराने हिंदी संगीत के लिए बनाया गया\n"
+            "एक premium Telegram music experience.\n\n"
+            "💿 Old is Gold ❤️"
+        )
 
-    elif call.data == "itch":
-        text = """
-🔥 <b>खुजली / जलन</b>
+    elif query.data == "help":
 
-कृपया बताएं:
-
-1️⃣ समस्या कहाँ है?
-2️⃣ कितने दिनों से है?
-3️⃣ लालपन / rash है?
-4️⃣ कोई discharge या घाव है?
-5️⃣ कोई नई cream/medicine इस्तेमाल की है?
-
-इन details से बेहतर सामान्य guidance दी जा सकती है।
-"""
-
-    elif call.data == "discharge":
-        text = """
-💧 <b>Discharge की समस्या</b>
-
-कृपया बताएं:
-
-1️⃣ पुरुष या महिला?
-2️⃣ discharge कब से है?
-3️⃣ रंग कैसा है?
-4️⃣ smell है?
-5️⃣ दर्द या जलन है?
-6️⃣ पेशाब करते समय परेशानी है?
-
-⚠️ असामान्य discharge infection का संकेत भी हो सकता है।
-"""
-
-    elif call.data == "urine":
-        text = """
-🚽 <b>पेशाब से जुड़ी समस्या</b>
-
-बताएं:
-
-1️⃣ जलन है?
-2️⃣ बार-बार पेशाब आता है?
-3️⃣ दर्द है?
-4️⃣ urine में blood दिखा?
-5️⃣ बुखार है?
-6️⃣ समस्या कितने समय से है?
-
-⚠️ तेज दर्द, blood या fever होने पर medical care जरूरी हो सकती है।
-"""
-
-    elif call.data == "sexual":
-        text = """
-❤️ <b>Sexual Health</b>
-
-अपनी समस्या खुलकर लेकिन सामान्य शब्दों में बताएं।
-
-उदाहरण:
-• erection problem
-• premature ejaculation
-• sexual desire में कमी
-• performance anxiety
-
-🔐 यहाँ diagnosis का दावा नहीं किया जाएगा।
-पहले symptoms और history समझी जाएगी।
-"""
-
-    elif call.data == "ayurveda":
-        text = """
-🌿 <b>Ayurvedic Guidance</b>
-
-Ayurveda में कई lifestyle और supportive approaches
-बताए जाते हैं।
-
-लेकिन किसी भी बीमारी के लिए बिना diagnosis के
-पक्का इलाज या निश्चित नुस्खा देना सुरक्षित नहीं है।
-
-आप अपनी समस्या लिखें। मैं पहले जरूरी जानकारी पूछूँगा।
-"""
-
-    elif call.data == "doctor":
-        text = """
-🩺 <b>Doctor कब दिखाएँ?</b>
-
-अगर इनमें से कोई symptom हो तो medical professional
-से सलाह लेना जरूरी हो सकता है:
-
-🚨 तेज दर्द
-🚨 बुखार
-🚨 खून आना
-🚨 घाव / ulcer
-🚨 अचानक swelling
-🚨 गंभीर infection जैसा लगना
-🚨 symptoms लगातार बढ़ना
-
-आपात स्थिति में तुरंत medical care लें।
-"""
-
-    else:
-        text = "🙏 कृपया ऊपर दिए गए options में से कोई Category चुनें।"
-
-    bot.answer_callback_query(call.id)
-    bot.send_message(chat_id, text)
+        await query.message.reply_text(
+            "❓ *HELP*\n\n"
+            "🔎 Search Song — गाना खोजें\n"
+            "🎤 Search Singer — Singer के गाने खोजें\n"
+            "🎬 Search Movie — Movie के गाने खोजें\n"
+            "❤️ Favourite — पसंदीदा गाने\n"
+            "🔀 Random — Random song"
+        )
 
 
-# 💬 Normal Message
-@bot.message_handler(func=lambda message: True)
-def normal_message(message):
+# =========================
+# 🚀 BOT START
+# =========================
+def main():
 
-    text = """
-🔎 <b>आपकी समस्या प्राप्त हुई।</b>
+    if not TOKEN:
+        raise ValueError("BOT_TOKEN नहीं मिला!")
 
-बेहतर guidance के लिए कृपया ये जानकारी दें:
+    app = Application.builder().token(TOKEN).build()
 
-1️⃣ आपकी उम्र
-2️⃣ समस्या क्या है?
-3️⃣ कितने समय से है?
-4️⃣ दर्द / खुजली / जलन है?
-5️⃣ कोई discharge / rash / wound है?
-6️⃣ अभी कोई medicine या cream इस्तेमाल कर रहे हैं?
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CallbackQueryHandler(button_handler))
 
-🌿 जानकारी मिलने के बाद मैं आपको
-सामान्य health guidance और suitable next steps बताऊँगा।
+    print("🎵 Old Hindi Music Bot Started...")
 
-⚠️ बिना जांच के किसी बीमारी का पक्का diagnosis
-या guaranteed treatment नहीं दिया जाएगा।
-"""
-
-    bot.send_message(message.chat.id, text)
+    app.run_polling()
 
 
-# 🚀 Start Bot
-bot.infinity_polling()
+if __name__ == "__main__":
+    main()
