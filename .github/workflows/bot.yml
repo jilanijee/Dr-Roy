@@ -2,7 +2,6 @@ name: Telegram Bot
 
 on:
   workflow_dispatch:
-  push:
 
 jobs:
   run-bot:
